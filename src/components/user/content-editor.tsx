@@ -2,11 +2,19 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { Type, ImageIcon, Link2, Check, AlertCircle } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import type { Design } from '@/types'
 
 interface ContentEditorProps {
   design: Design
 }
+
+const TABS = [
+  { key: 'text' as const, label: 'Texte', icon: Type },
+  { key: 'image' as const, label: 'Image', icon: ImageIcon },
+  { key: 'link' as const, label: 'Lien', icon: Link2 },
+]
 
 export function ContentEditor({ design }: ContentEditorProps) {
   const [contentType, setContentType] = useState(design.content_type)
@@ -41,18 +49,24 @@ export function ContentEditor({ design }: ContentEditorProps) {
   }
 
   return (
-    <div className="bg-white rounded-lg border p-6 space-y-6">
+    <div className="glass-panel p-6 space-y-6">
+      <h3 className="font-semibold text-lg text-text-primary">Modifier le contenu</h3>
+
       {/* Content type tabs */}
       <div className="flex gap-2">
-        {(['text', 'image', 'link'] as const).map((type) => (
+        {TABS.map((tab) => (
           <button
-            key={type}
-            onClick={() => setContentType(type)}
-            className={`px-4 py-2 rounded-md text-sm font-medium capitalize ${
-              contentType === type ? 'bg-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
+            key={tab.key}
+            onClick={() => setContentType(tab.key)}
+            className={cn(
+              'flex items-center gap-2 px-4 py-2.5 rounded-[18px] text-sm font-semibold transition-all',
+              contentType === tab.key
+                ? 'bg-primary text-white'
+                : 'bg-surface-alt text-text-secondary hover:text-text-primary hover:bg-surface-alt/80'
+            )}
           >
-            {type === 'text' ? 'Texte' : type === 'image' ? 'Image' : 'Lien'}
+            <tab.icon className="w-4 h-4" />
+            {tab.label}
           </button>
         ))}
       </div>
@@ -60,7 +74,7 @@ export function ContentEditor({ design }: ContentEditorProps) {
       {/* Content input */}
       {contentType === 'text' && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-text-primary mb-2">
             Message affiché lors du scan
           </label>
           <textarea
@@ -68,56 +82,67 @@ export function ContentEditor({ design }: ContentEditorProps) {
             onChange={(e) => setMessage(e.target.value)}
             rows={6}
             maxLength={5000}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+            className="input !h-auto py-3 resize-none"
             placeholder="Écrivez votre message ici..."
           />
-          <p className="text-xs text-gray-400 mt-1">{message.length}/5000</p>
+          <p className="text-xs text-text-secondary mt-2">{message.length}/5000</p>
         </div>
       )}
 
       {contentType === 'image' && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-text-primary mb-2">
             URL de l&apos;image
           </label>
           <input
             type="url"
             value={mediaUrl}
             onChange={(e) => setMediaUrl(e.target.value)}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-            placeholder="https://drive.google.com/... ou lien direct vers l'image"
+            className="input"
+            placeholder="https://drive.google.com/... ou lien direct"
           />
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-text-secondary mt-2">
             Collez un lien de partage Google Drive, Dropbox, ou un lien direct vers une image.
           </p>
           {mediaUrl && (
-            <img src={mediaUrl} alt="Preview" className="mt-2 max-h-48 rounded border" />
+            <img src={mediaUrl} alt="Preview" className="mt-3 max-h-48 rounded-[16px] border border-border" />
           )}
         </div>
       )}
 
       {contentType === 'link' && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-text-primary mb-2">
             URL de redirection
           </label>
           <input
             type="url"
             value={mediaUrl}
             onChange={(e) => setMediaUrl(e.target.value)}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+            className="input"
             placeholder="https://exemple.com"
           />
         </div>
       )}
 
-      {error && <div className="bg-red-50 text-red-700 p-3 rounded-md text-sm">{error}</div>}
-      {saved && <div className="bg-green-50 text-green-700 p-3 rounded-md text-sm">Sauvegardé !</div>}
+      {/* Feedback */}
+      {error && (
+        <div className="flex items-center gap-2 bg-danger/10 text-danger p-4 rounded-[16px] text-sm">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          {error}
+        </div>
+      )}
+      {saved && (
+        <div className="flex items-center gap-2 bg-success/10 text-success p-4 rounded-[16px] text-sm">
+          <Check className="w-4 h-4 shrink-0" />
+          Sauvegardé !
+        </div>
+      )}
 
       <button
         onClick={handleSave}
         disabled={saving}
-        className="px-6 py-2.5 bg-black text-white rounded-md text-sm font-medium hover:bg-gray-800 disabled:opacity-50"
+        className="btn-primary w-full"
       >
         {saving ? 'Sauvegarde...' : 'Sauvegarder'}
       </button>
