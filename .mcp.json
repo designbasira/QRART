@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp"
+    },
+    "stitch": {
+      "type": "http",
+      "url": "https://stitch.googleapis.com/mcp",
+      "headers": {
+        "X-Goog-Api-Key": "${STITCH_API_KEY}"
+      }
+    },
+    "figma": {
+      "command": "npx",
+      "args": ["mcp-remote", "http://127.0.0.1:3845/mcp"]
+    },
+    "blender": {
+      "command": "npx",
+      "args": ["mcp-remote", "http://127.0.0.1:9876/mcp"]
+    }
+  }
+}

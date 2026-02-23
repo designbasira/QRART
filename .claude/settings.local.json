@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(test:*)",
+      "Bash(node:*)",
+      "Bash(npm --version:*)",
+      "Bash(npx --version:*)",
+      "Bash(pip --version:*)",
+      "mcp__claude_ai_Vercel__search_vercel_documentation",
+      "WebFetch(domain:supabase.com)",
+      "Bash(gh repo view:*)",
+      "Bash(gh repo clone:*)",
+      "Bash(git -C /tmp/superpowers log --oneline -20)",
+      "Bash(git init:*)",
+      "Bash(git clone:*)",
+      "Bash(git pull:*)",
+      "Bash(npx create-next-app@latest:*)",
+      "Bash(npx next build:*)",
+      "Bash(git remote add:*)"
+    ]
+  }
+}
