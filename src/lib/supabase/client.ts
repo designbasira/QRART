@@ -1,8 +1,15 @@
-import { createBrowserClient } from '@supabase/ssr'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let client: any = null
 
 export function createClient() {
-  return createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+  if (!client) {
+    client = createSupabaseClient(
+      import.meta.env.VITE_SUPABASE_URL,
+      import.meta.env.VITE_SUPABASE_ANON_KEY,
+      { auth: { flowType: 'pkce' } }
+    )
+  }
+  return client
 }

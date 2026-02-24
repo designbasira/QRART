@@ -1,112 +1,109 @@
-'use client'
-
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import { Link } from 'react-router-dom'
 import { createClient } from '@/lib/supabase/client'
 import { signupSchema, type SignupInput } from '@/lib/validators'
 import { ADMIN_INVITE_CODE } from '@/lib/constants'
-import { AlertCircle, Mail } from 'lucide-react'
+import { AlertCircle } from 'lucide-react'
 
 export function SignupForm() {
-  const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
   const [wantAdmin, setWantAdmin] = useState(false)
-  const [emailSent, setEmailSent] = useState(false)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError(null)
     setLoading(true)
 
-    const formData = new FormData(e.currentTarget)
-    const input: SignupInput = {
-      email: formData.get('email') as string,
-      password: formData.get('password') as string,
-      full_name: formData.get('full_name') as string,
-      role: wantAdmin ? 'admin' : 'user',
-      invite_code: wantAdmin ? (formData.get('invite_code') as string) : undefined,
-    }
+    try {
+      const formData = new FormData(e.currentTarget)
+      const input: SignupInput = {
+        email: formData.get('email') as string,
+        password: formData.get('password') as string,
+        full_name: formData.get('full_name') as string,
+        role: wantAdmin ? 'admin' : 'user',
+        invite_code: wantAdmin ? (formData.get('invite_code') as string) : undefined,
+      }
 
-    const result = signupSchema.safeParse(input)
-    if (!result.success) {
-      setError(result.error.issues[0].message)
-      setLoading(false)
-      return
-    }
+      const result = signupSchema.safeParse(input)
+      if (!result.success) {
+        setError(result.error.issues[0].message)
+        setLoading(false)
+        return
+      }
 
-    if (input.role === 'admin' && input.invite_code !== ADMIN_INVITE_CODE) {
-      setError("Code d'invitation admin invalide")
-      setLoading(false)
-      return
-    }
+      if (input.role === 'admin' && input.invite_code !== ADMIN_INVITE_CODE) {
+        setError("Code d'invitation admin invalide")
+        setLoading(false)
+        return
+      }
 
-    const supabase = createClient()
-    const { data, error: authError } = await supabase.auth.signUp({
-      email: input.email,
-      password: input.password,
-      options: {
-        data: {
-          full_name: input.full_name,
-          role: input.role,
+      // 1. Create user via Supabase Auth (email confirm disabled via CLI)
+      const supabase = createClient()
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: input.email,
+        password: input.password,
+        options: {
+          data: {
+            full_name: input.full_name,
+            role: input.role,
+          },
         },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
+      })
+      if (signUpError) {
+        setError(signUpError.message)
+        setLoading(false)
+        return
+      }
 
-    if (authError) {
-      setError(authError.message)
+      // 2. Update profile role if admin
+      if (input.role === 'admin' && signUpData.user) {
+        await supabase
+          .from('profiles')
+          .update({ role: 'admin', full_name: input.full_name })
+          .eq('id', signUpData.user.id)
+      }
+
+      // 3. Redirect to dashboard
+      window.location.href = input.role === 'admin' ? '/admin' : '/user'
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Une erreur inattendue est survenue')
       setLoading(false)
-      return
     }
-
-    if (data.session) {
-      router.push(input.role === 'admin' ? '/admin' : '/user')
-      router.refresh()
-      return
-    }
-
-    setEmailSent(true)
-    setLoading(false)
   }
 
   async function handleGoogleSignup() {
+    setError(null)
     setGoogleLoading(true)
-    const supabase = createClient()
-    const { error: oauthError } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-    if (oauthError) {
-      setError(oauthError.message)
+    try {
+      const supabase = createClient()
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+      if (oauthError) {
+        setError(oauthError.message)
+        setGoogleLoading(false)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur de connexion Google')
       setGoogleLoading(false)
     }
   }
 
-  if (emailSent) {
-    return (
-      <div className="text-center space-y-4 animate-scale-in">
-        <div className="w-14 h-14 rounded-[999px] bg-success/10 flex items-center justify-center mx-auto">
-          <Mail className="w-7 h-7 text-success" />
-        </div>
-        <h3 className="text-lg font-semibold text-text-primary">Vérifiez votre email</h3>
-        <p className="text-sm text-text-secondary">
-          Un lien de confirmation a été envoyé à votre adresse email.
-          Cliquez dessus pour activer votre compte.
-        </p>
-        <Link href="/login" className="inline-block text-sm font-semibold text-primary hover:underline mt-2">
-          Retour à la connexion
-        </Link>
-      </div>
-    )
-  }
-
   return (
     <div className="space-y-5">
+      {/* Error banner — visible for both Google and email signup */}
+      {error && (
+        <div className="flex items-center gap-2 bg-danger/10 text-danger p-4 rounded-[16px] text-sm animate-scale-in">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          {error}
+        </div>
+      )}
+
       {/* Google OAuth */}
       <button
         type="button"
@@ -134,13 +131,6 @@ export function SignupForm() {
 
       {/* Email form */}
       <form onSubmit={handleSubmit} className="space-y-4">
-        {error && (
-          <div className="flex items-center gap-2 bg-danger/10 text-danger p-4 rounded-[16px] text-sm">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            {error}
-          </div>
-        )}
-
         <div>
           <label htmlFor="full_name" className="block text-sm font-medium text-text-primary mb-2">
             Nom complet
@@ -224,7 +214,7 @@ export function SignupForm() {
 
       <p className="text-center text-sm text-text-secondary">
         Déjà un compte ?{' '}
-        <Link href="/login" className="font-semibold text-primary hover:underline">
+        <Link to="/login" className="font-semibold text-primary hover:underline">
           Se connecter
         </Link>
       </p>

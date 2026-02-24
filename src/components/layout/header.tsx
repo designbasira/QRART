@@ -1,9 +1,9 @@
-'use client'
-
-import { useRouter } from 'next/navigation'
+import { useNavigate } from 'react-router-dom'
 import { createClient } from '@/lib/supabase/client'
 import { APP_NAME } from '@/lib/constants'
 import { LogOut, Shield, User, Menu, Bell } from 'lucide-react'
+import { ThemeToggle } from '@/components/layout/theme-toggle'
+import { LocaleToggle } from '@/components/layout/locale-toggle'
 import type { Profile } from '@/types'
 
 interface HeaderProps {
@@ -12,13 +12,12 @@ interface HeaderProps {
 }
 
 export function Header({ profile, onMenuToggle }: HeaderProps) {
-  const router = useRouter()
+  const navigate = useNavigate()
 
   async function handleLogout() {
     const supabase = createClient()
     await supabase.auth.signOut()
-    router.push('/login')
-    router.refresh()
+    navigate('/login')
   }
 
   const initials = profile.full_name
@@ -52,6 +51,14 @@ export function Header({ profile, onMenuToggle }: HeaderProps) {
           {profile.role === 'admin' ? <Shield className="w-3 h-3" /> : <User className="w-3 h-3" />}
           {profile.role}
         </span>
+
+        {/* Locale toggle */}
+        <div className="hidden sm:block">
+          <LocaleToggle />
+        </div>
+
+        {/* Theme toggle */}
+        <ThemeToggle />
 
         {/* Notification bell */}
         <button className="p-2 rounded-[18px] text-text-secondary hover:text-text-primary hover:bg-surface-alt transition-colors">

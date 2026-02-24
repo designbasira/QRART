@@ -16,7 +16,23 @@
       "Bash(git pull:*)",
       "Bash(npx create-next-app@latest:*)",
       "Bash(npx next build:*)",
-      "Bash(git remote add:*)"
+      "Bash(git remote add:*)",
+      "Bash(git branch:*)",
+      "mcp__stitch__create_project",
+      "mcp__stitch__list_projects",
+      "WebFetch(domain:stitch.withgoogle.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(git rm:*)",
+      "mcp__stitch__generate_screen_from_text",
+      "mcp__stitch__list_screens",
+      "mcp__stitch__get_screen",
+      "mcp__stitch__get_project",
+      "Bash(npx next dev:*)",
+      "WebFetch(domain:lyxdcnjiwkaembuizcvs.supabase.co)",
+      "Bash(python -m json.tool:*)",
+      "Bash(npx supabase:*)",
+      "Bash(SUPABASE_ACCESS_TOKEN=sbp_1437cbdbad04a8ba09f56787881b6e8bca36e52d npx supabase:*)",
+      "Bash(git status:*)"
     ]
   }
 }

@@ -1,7 +1,4 @@
-'use client'
-
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { Link, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { Home, Grid3X3, Plus, Crown, Settings } from 'lucide-react'
 import type { Profile } from '@/types'
@@ -27,7 +24,7 @@ const adminTabs = [
 ]
 
 export function BottomNav({ profile }: BottomNavProps) {
-  const pathname = usePathname()
+  const { pathname } = useLocation()
   const tabs = profile.role === 'admin' ? adminTabs : userTabs
 
   return (
@@ -43,7 +40,7 @@ export function BottomNav({ profile }: BottomNavProps) {
             return (
               <Link
                 key={tab.label}
-                href={tab.href}
+                to={tab.href}
                 className="flex flex-col items-center justify-center -mt-4"
               >
                 <div className="w-14 h-14 rounded-full bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
@@ -56,7 +53,7 @@ export function BottomNav({ profile }: BottomNavProps) {
           return (
             <Link
               key={tab.label}
-              href={tab.href}
+              to={tab.href}
               className="flex flex-col items-center justify-center gap-1 min-w-[56px]"
             >
               <div className={cn(

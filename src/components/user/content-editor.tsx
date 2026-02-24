@@ -1,4 +1,3 @@
-'use client'
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -52,17 +51,17 @@ export function ContentEditor({ design }: ContentEditorProps) {
     <div className="glass-panel p-6 space-y-6">
       <h3 className="font-semibold text-lg text-text-primary">Modifier le contenu</h3>
 
-      {/* Content type tabs */}
-      <div className="flex gap-2">
+      {/* Content type tabs — glass pill row */}
+      <div className="flex gap-1.5 p-1.5 rounded-[22px] bg-surface-alt/80">
         {TABS.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setContentType(tab.key)}
             className={cn(
-              'flex items-center gap-2 px-4 py-2.5 rounded-[18px] text-sm font-semibold transition-all',
+              'flex items-center gap-2 px-4 py-2.5 rounded-[18px] text-sm font-semibold transition-all flex-1 justify-center',
               contentType === tab.key
-                ? 'bg-primary text-white'
-                : 'bg-surface-alt text-text-secondary hover:text-text-primary hover:bg-surface-alt/80'
+                ? 'bg-primary text-white shadow-sm'
+                : 'text-text-secondary hover:text-text-primary'
             )}
           >
             <tab.icon className="w-4 h-4" />
@@ -85,7 +84,12 @@ export function ContentEditor({ design }: ContentEditorProps) {
             className="input !h-auto py-3 resize-none"
             placeholder="Écrivez votre message ici..."
           />
-          <p className="text-xs text-text-secondary mt-2">{message.length}/5000</p>
+          <div className="flex items-center justify-between mt-2">
+            <p className="text-xs text-text-secondary">{message.length}/5000</p>
+            <div className="h-1 w-20 rounded-full bg-surface-alt overflow-hidden">
+              <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${Math.min((message.length / 5000) * 100, 100)}%` }} />
+            </div>
+          </div>
         </div>
       )}
 

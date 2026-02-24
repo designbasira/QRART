@@ -1,10 +1,10 @@
-'use client'
 
 import { useState, useRef, useEffect } from 'react'
 import { createStyledQR } from '@/lib/qr/generate'
 import { createClient } from '@/lib/supabase/client'
 import { nanoid } from 'nanoid'
 import type { QRConfig } from '@/lib/qr/types'
+import { Save, AlertTriangle } from 'lucide-react'
 
 interface QRGeneratorProps {
   silhouetteImage: string
@@ -54,7 +54,6 @@ export function QRGenerator({ silhouetteImage, onQRGenerated }: QRGeneratorProps
 
       if (dbError) throw new Error(dbError.message)
 
-      // Get QR as data URL for export step
       const qr = createStyledQR(config)
       const blob = await qr.getRawData('png')
       if (!blob) throw new Error('Échec de la génération QR')
@@ -72,23 +71,23 @@ export function QRGenerator({ silhouetteImage, onQRGenerated }: QRGeneratorProps
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Générer le QR Code</h3>
+      <h3 className="text-lg font-semibold text-text-primary">Générer le QR Code</h3>
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
         {/* Preview */}
         <div>
-          <p className="text-sm text-gray-500 mb-2">Aperçu</p>
-          <div ref={qrRef} className="border rounded-lg p-4 flex items-center justify-center bg-white" />
+          <p className="text-sm text-text-secondary mb-2">Aperçu</p>
+          <div ref={qrRef} className="border border-border rounded-[18px] p-4 flex items-center justify-center bg-surface" />
         </div>
 
         {/* Options */}
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Style des points</label>
+            <label className="block text-sm font-medium text-text-primary mb-1">Style des points</label>
             <select
               value={config.dotsType}
               onChange={(e) => setConfig({ ...config, dotsType: e.target.value as QRConfig['dotsType'] })}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+              className="input w-full"
             >
               <option value="rounded">Arrondi</option>
               <option value="dots">Points</option>
@@ -99,22 +98,22 @@ export function QRGenerator({ silhouetteImage, onQRGenerated }: QRGeneratorProps
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Couleur des points</label>
+            <label className="block text-sm font-medium text-text-primary mb-1">Couleur des points</label>
             <input
               type="color"
               value={config.dotsColor}
               onChange={(e) => setConfig({ ...config, dotsColor: e.target.value })}
-              className="h-10 w-full rounded-md border border-gray-300 cursor-pointer"
+              className="h-[48px] w-full rounded-[16px] border border-border cursor-pointer"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Couleur de fond</label>
+            <label className="block text-sm font-medium text-text-primary mb-1">Couleur de fond</label>
             <input
               type="color"
               value={config.backgroundColor}
               onChange={(e) => setConfig({ ...config, backgroundColor: e.target.value })}
-              className="h-10 w-full rounded-md border border-gray-300 cursor-pointer"
+              className="h-[48px] w-full rounded-[16px] border border-border cursor-pointer"
             />
           </div>
 
@@ -126,28 +125,31 @@ export function QRGenerator({ silhouetteImage, onQRGenerated }: QRGeneratorProps
               onChange={(e) =>
                 setConfig({ ...config, overlayImageUrl: e.target.checked ? silhouetteImage : undefined })
               }
-              className="h-4 w-4 rounded border-gray-300"
+              className="h-4 w-4 rounded border-border accent-primary"
             />
-            <label htmlFor="overlay" className="text-sm text-gray-700">
+            <label htmlFor="overlay" className="text-sm text-text-primary">
               Superposer la silhouette
             </label>
           </div>
 
-          <p className="text-xs text-gray-400">
-            ID: {config.shortId} | Correction d&apos;erreur: H (30%)
+          <p className="text-xs text-text-secondary">
+            ID: <span className="font-mono bg-surface-alt px-1.5 py-0.5 rounded-[999px]">{config.shortId}</span> | Correction d&apos;erreur: H (30%)
           </p>
         </div>
       </div>
 
       {error && (
-        <div className="bg-red-50 text-red-700 p-3 rounded-md text-sm">{error}</div>
+        <div className="bg-danger/10 text-danger p-3 rounded-[16px] text-sm flex items-center gap-2">
+          <AlertTriangle size={16} /> {error}
+        </div>
       )}
 
       <button
         onClick={handleSaveDesign}
         disabled={loading}
-        className="px-6 py-2.5 bg-black text-white rounded-md text-sm font-medium hover:bg-gray-800 disabled:opacity-50"
+        className="btn-primary flex items-center gap-2"
       >
+        <Save size={16} />
         {loading ? 'Sauvegarde...' : 'Sauvegarder et continuer'}
       </button>
     </div>

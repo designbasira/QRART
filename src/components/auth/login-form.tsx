@@ -1,14 +1,10 @@
-'use client'
-
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import { Link } from 'react-router-dom'
 import { createClient } from '@/lib/supabase/client'
 import { loginSchema, type LoginInput } from '@/lib/validators'
 import { AlertCircle } from 'lucide-react'
 
 export function LoginForm() {
-  const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
@@ -18,67 +14,90 @@ export function LoginForm() {
     setError(null)
     setLoading(true)
 
-    const formData = new FormData(e.currentTarget)
-    const input: LoginInput = {
-      email: formData.get('email') as string,
-      password: formData.get('password') as string,
-    }
-
-    const result = loginSchema.safeParse(input)
-    if (!result.success) {
-      setError(result.error.issues[0].message)
-      setLoading(false)
-      return
-    }
-
-    const supabase = createClient()
-    const { error: authError } = await supabase.auth.signInWithPassword(input)
-
-    if (authError) {
-      const msg = authError.message
-      if (msg.includes('Invalid login credentials')) {
-        setError('Email ou mot de passe incorrect')
-      } else if (msg.includes('Email not confirmed')) {
-        setError('Veuillez confirmer votre email avant de vous connecter')
-      } else if (msg.includes('Too many requests')) {
-        setError('Trop de tentatives. Réessayez dans quelques minutes.')
-      } else {
-        setError(msg)
+    try {
+      const formData = new FormData(e.currentTarget)
+      const input: LoginInput = {
+        email: formData.get('email') as string,
+        password: formData.get('password') as string,
       }
-      setLoading(false)
-      return
-    }
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
+      const result = loginSchema.safeParse(input)
+      if (!result.success) {
+        setError(result.error.issues[0].message)
+        setLoading(false)
+        return
+      }
+
+      const supabase = createClient()
+      const { data, error: authError } = await supabase.auth.signInWithPassword(input)
+
+      if (authError) {
+        const msg = authError.message
+        if (msg.includes('Invalid login credentials')) {
+          setError('Email ou mot de passe incorrect')
+        } else if (msg.includes('Email not confirmed')) {
+          setError('Veuillez confirmer votre email avant de vous connecter')
+        } else if (msg.includes('Too many requests')) {
+          setError('Trop de tentatives. Réessayez dans quelques minutes.')
+        } else {
+          setError(msg)
+        }
+        setLoading(false)
+        return
+      }
+
+      if (!data.session) {
+        setError('Impossible de créer la session. Vérifiez que votre email est confirmé.')
+        setLoading(false)
+        return
+      }
+
+      // Use the user from the session (already authenticated, no need for getUser())
       const { data: profile } = await supabase
         .from('profiles')
         .select('role')
-        .eq('id', user.id)
+        .eq('id', data.session.user.id)
         .single()
 
-      router.push(profile?.role === 'admin' ? '/admin' : '/user')
-      router.refresh()
+      // Hard navigation to ensure cookies are sent with the request
+      window.location.href = profile?.role === 'admin' ? '/admin' : '/user'
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Une erreur inattendue est survenue')
+      setLoading(false)
     }
   }
 
   async function handleGoogleLogin() {
+    setError(null)
     setGoogleLoading(true)
-    const supabase = createClient()
-    const { error: oauthError } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    })
-    if (oauthError) {
-      setError(oauthError.message)
+    try {
+      const supabase = createClient()
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      })
+      if (oauthError) {
+        setError(oauthError.message)
+        setGoogleLoading(false)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur de connexion Google')
       setGoogleLoading(false)
     }
   }
 
   return (
     <div className="space-y-5">
+      {/* Error banner — visible for both Google and email login */}
+      {error && (
+        <div className="flex items-center gap-2 bg-danger/10 text-danger p-4 rounded-[16px] text-sm animate-scale-in">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          {error}
+        </div>
+      )}
+
       {/* Google OAuth */}
       <button
         type="button"
@@ -106,13 +125,6 @@ export function LoginForm() {
 
       {/* Email form */}
       <form onSubmit={handleSubmit} className="space-y-4">
-        {error && (
-          <div className="flex items-center gap-2 bg-danger/10 text-danger p-4 rounded-[16px] text-sm">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            {error}
-          </div>
-        )}
-
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-text-primary mb-2">
             Email
@@ -152,7 +164,7 @@ export function LoginForm() {
 
       <p className="text-center text-sm text-text-secondary">
         Pas encore de compte ?{' '}
-        <Link href="/signup" className="font-semibold text-primary hover:underline">
+        <Link to="/signup" className="font-semibold text-primary hover:underline">
           S&apos;inscrire
         </Link>
       </p>

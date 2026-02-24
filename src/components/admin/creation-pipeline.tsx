@@ -1,4 +1,3 @@
-'use client'
 
 import { useState } from 'react'
 import { ImageUpload } from './image-upload'
@@ -65,8 +64,8 @@ export function CreationPipeline() {
                 disabled={isUpcoming}
               >
                 <div className={cn(
-                  'w-10 h-10 rounded-[999px] flex items-center justify-center text-sm font-semibold transition-all',
-                  isActive && 'bg-primary text-white shadow-lg shadow-primary/30',
+                  'w-10 h-10 rounded-[999px] flex items-center justify-center text-sm font-semibold transition-all duration-300',
+                  isActive && 'bg-primary text-white shadow-lg shadow-primary/30 ring-4 ring-primary/15 scale-110',
                   isCompleted && 'bg-primary text-white',
                   isUpcoming && 'bg-surface-alt text-text-secondary border border-border'
                 )}>

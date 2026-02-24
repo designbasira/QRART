@@ -1,9 +1,9 @@
-'use client'
 
 import { useState } from 'react'
 import { Header } from './header'
 import { Sidebar, MobileSidebar } from './sidebar'
 import { BottomNav } from './bottom-nav'
+import { InstallBanner } from './install-banner'
 import type { Profile } from '@/types'
 
 export function DashboardShell({ profile, children }: { profile: Profile; children: React.ReactNode }) {
@@ -20,6 +20,7 @@ export function DashboardShell({ profile, children }: { profile: Profile; childr
         </main>
       </div>
       <BottomNav profile={profile} />
+      <InstallBanner />
     </div>
   )
 }

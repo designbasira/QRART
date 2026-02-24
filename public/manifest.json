@@ -7,6 +7,7 @@
   "background_color": "#FFF8F3",
   "theme_color": "#F1641E",
   "orientation": "portrait-primary",
+  "categories": ["design", "business", "productivity"],
   "icons": [
     {
       "src": "/icons/icon-192.png",
@@ -19,6 +20,20 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Mes designs",
+      "short_name": "Designs",
+      "url": "/user/designs",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Paramètres",
+      "short_name": "Réglages",
+      "url": "/user/settings",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }

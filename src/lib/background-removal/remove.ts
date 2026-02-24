@@ -1,6 +1,6 @@
 'use client'
 
-import { removeBackground, type Config } from '@imgly/background-removal'
+import type { Config } from '@imgly/background-removal'
 
 export interface RemovalProgress {
   phase: 'loading' | 'processing' | 'complete'
@@ -24,6 +24,7 @@ export async function removeImageBackground(
     },
   }
 
+  const { removeBackground } = await import('@imgly/background-removal')
   const result = await removeBackground(imageSource, config)
   onProgress?.({ phase: 'complete', progress: 1 })
   return result

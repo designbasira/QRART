@@ -1,4 +1,5 @@
-const API_KEY = process.env.GOOGLE_AI_API_KEY!;
+// TODO: Move to Supabase Edge Function (server-side only API key)
+const API_KEY = import.meta.env.VITE_GOOGLE_AI_API_KEY ?? '';
 const IMAGEN_URL = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${API_KEY}`;
 
 export async function generateMockup(prompt: string) {

@@ -1,7 +1,4 @@
-'use client'
-
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { Link, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { LayoutDashboard, Plus, Image, Users, FolderOpen, Link2, Settings, X } from 'lucide-react'
 import type { Profile } from '@/types'
@@ -28,7 +25,7 @@ const userNav: NavItem[] = [
 
 /* ============ ICON SIDEBAR (Desktop) — Image 3/4 style ============ */
 export function Sidebar({ profile }: { profile: Profile }) {
-  const pathname = usePathname()
+  const { pathname } = useLocation()
   const navItems = profile.role === 'admin' ? adminNav : userNav
 
   const initials = profile.full_name
@@ -50,11 +47,11 @@ export function Sidebar({ profile }: { profile: Profile }) {
           return (
             <Link
               key={item.href}
-              href={item.href}
+              to={item.href}
               className={cn(
-                'relative w-10 h-10 rounded-[18px] flex items-center justify-center transition-all group',
+                'relative w-10 h-10 rounded-[18px] flex items-center justify-center transition-all duration-200 group',
                 isActive
-                  ? 'bg-primary-soft text-primary'
+                  ? 'bg-primary-soft text-primary shadow-sm shadow-primary/10'
                   : 'text-text-secondary hover:bg-surface-alt hover:text-text-primary'
               )}
               title={item.label}
@@ -71,7 +68,7 @@ export function Sidebar({ profile }: { profile: Profile }) {
 
       {/* Settings */}
       <Link
-        href={profile.role === 'admin' ? '/admin/settings' : '/user/settings'}
+        to={profile.role === 'admin' ? '/admin/settings' : '/user/settings'}
         className="w-10 h-10 rounded-[18px] flex items-center justify-center text-text-secondary hover:bg-surface-alt hover:text-text-primary transition-all mb-2"
         title="Paramètres"
       >
@@ -88,7 +85,7 @@ export function Sidebar({ profile }: { profile: Profile }) {
 
 /* ============ MOBILE SIDEBAR (Overlay) ============ */
 export function MobileSidebar({ profile, open, onClose }: { profile: Profile; open: boolean; onClose: () => void }) {
-  const pathname = usePathname()
+  const { pathname } = useLocation()
   const navItems = profile.role === 'admin' ? adminNav : userNav
 
   if (!open) return null
@@ -116,7 +113,7 @@ export function MobileSidebar({ profile, open, onClose }: { profile: Profile; op
             return (
               <Link
                 key={item.href}
-                href={item.href}
+                to={item.href}
                 onClick={onClose}
                 className={cn(
                   'flex items-center gap-3 px-4 py-3 rounded-[18px] text-sm font-semibold transition-all',

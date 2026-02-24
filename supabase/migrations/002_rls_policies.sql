@@ -14,11 +14,9 @@ CREATE POLICY "Users can view own profile"
   ON public.profiles FOR SELECT
   USING (auth.uid() = id);
 
-CREATE POLICY "Admins can view all profiles"
-  ON public.profiles FOR SELECT
-  USING (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
-  );
+-- NOTE: "Admins can view all profiles" removed — was causing infinite recursion
+-- (policy on profiles doing SELECT on profiles). Admins see their own profile
+-- via "Users can view own profile". Admin listing uses service role key.
 
 CREATE POLICY "Users can update own profile"
   ON public.profiles FOR UPDATE

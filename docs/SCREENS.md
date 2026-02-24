@@ -6,8 +6,8 @@
 
 ## 1. Landing Page (`/`)
 
-**Fichier** : `src/app/page.tsx`
-**Type** : Server Component (statique)
+**Fichier** : `src/pages/home.tsx`
+**Type** : Composant React
 **Inspiration** : Hero fashion-editorial + floating glass UI elements
 
 ### Sections
@@ -25,8 +25,8 @@
 
 ## 2. PWA Home / User Dashboard (`/user`)
 
-**Fichier** : `src/app/(dashboard)/user/page.tsx`
-**Type** : Server Component (dynamique, auth required)
+**Fichier** : `src/pages/user/dashboard.tsx`
+**Type** : Composant React (protégé par AuthGuard)
 **Inspiration** : Component cards arrondies, layout modulaire mobile-first
 
 ### Sections
@@ -41,8 +41,8 @@
 
 ## 3. Admin Dashboard (`/admin`)
 
-**Fichier** : `src/app/(dashboard)/admin/page.tsx`
-**Type** : Server Component (dynamique, admin only)
+**Fichier** : `src/pages/admin/dashboard.tsx`
+**Type** : Composant React (protégé par AuthGuard + RoleGuard)
 
 ### Sections
 | Section | Description |
@@ -56,7 +56,7 @@
 ## 4. Admin Pipeline (`/admin/create`)
 
 **Fichier** : `src/components/admin/creation-pipeline.tsx`
-**Type** : Client Component
+**Type** : Composant React
 
 ### Pipeline 4 étapes
 | Étape | Composant | Description |
@@ -70,10 +70,10 @@
 
 ---
 
-## 5. Content Editor (`/user/designs/[id]`)
+## 5. Content Editor (`/user/designs/:id`)
 
 **Fichier** : `src/components/user/content-editor.tsx`
-**Type** : Client Component
+**Type** : Composant React
 
 ### Tabs
 | Tab | Description |
@@ -89,7 +89,7 @@
 ## 6. Auth (Login / Signup)
 
 **Fichiers** : `src/components/auth/login-form.tsx`, `signup-form.tsx`
-**Layout** : `src/app/(auth)/layout.tsx` — centré, glass-card wrapper
+**Layout** : `src/layouts/auth-layout.tsx` — centré, glass-card wrapper
 
 ### Éléments
 - Google OAuth button (btn-secondary)

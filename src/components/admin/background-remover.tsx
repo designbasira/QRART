@@ -1,7 +1,7 @@
-'use client'
 
 import { useState } from 'react'
 import { removeImageBackground, type RemovalProgress } from '@/lib/background-removal/remove'
+import { Sparkles, AlertTriangle } from 'lucide-react'
 
 interface BackgroundRemoverProps {
   originalImage: string
@@ -37,34 +37,34 @@ export function BackgroundRemover({ originalImage, onBgRemoved }: BackgroundRemo
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Détourage automatique</h3>
+      <h3 className="text-lg font-semibold text-text-primary">Détourage automatique</h3>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <p className="text-sm text-gray-500 mb-2">Original</p>
-          <img src={originalImage} alt="Original" className="rounded border max-h-64 w-full object-contain" />
+          <p className="text-sm text-text-secondary mb-2">Original</p>
+          <img src={originalImage} alt="Original" className="rounded-[18px] border border-border max-h-64 w-full object-contain" />
         </div>
         <div>
-          <p className="text-sm text-gray-500 mb-2">Résultat</p>
+          <p className="text-sm text-text-secondary mb-2">Résultat</p>
           {result ? (
-            <img src={result} alt="Silhouette" className="rounded border max-h-64 w-full object-contain bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAAYdEVYdFRpdGxlAENoZWNrZXJib2FyZCBwYXR0ZXJuN6dJTgAAAC9JREFUOI1j/P///38GJMDIwMDAQIwmBgYGBob/DAz/GdCAMcP/RsMI3UAGB/IAALlnDff3Py6bAAAAAElFTkSuQmCC')]" />
+            <img src={result} alt="Silhouette" className="rounded-[18px] border border-border max-h-64 w-full object-contain bg-[url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAAYdEVYdFRpdGxlAENoZWNrZXJib2FyZCBwYXR0ZXJuN6dJTgAAAC9JREFUOI1j/P///38GJMDIwMDAQIwmBgYGBob/DAz/GdCAMcP/RsMI3UAGB/IAALlnDff3Py6bAAAAAElFTkSuQmCC')]" />
           ) : (
-            <div className="rounded border h-64 flex items-center justify-center bg-gray-50">
-              <p className="text-sm text-gray-400">En attente...</p>
+            <div className="rounded-[18px] border border-border h-64 flex items-center justify-center bg-surface-alt">
+              <p className="text-sm text-text-secondary">En attente...</p>
             </div>
           )}
         </div>
       </div>
 
       {progress && progress.phase !== 'complete' && (
-        <div className="space-y-1">
-          <div className="flex justify-between text-xs text-gray-500">
+        <div className="space-y-1.5">
+          <div className="flex justify-between text-xs text-text-secondary">
             <span>{phaseLabel}</span>
             <span>{progressPercent}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-surface-alt rounded-[999px] h-2">
             <div
-              className="bg-black h-2 rounded-full transition-all"
+              className="bg-primary h-2 rounded-[999px] transition-all duration-300"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
@@ -72,15 +72,18 @@ export function BackgroundRemover({ originalImage, onBgRemoved }: BackgroundRemo
       )}
 
       {error && (
-        <div className="bg-red-50 text-red-700 p-3 rounded-md text-sm">{error}</div>
+        <div className="bg-danger/10 text-danger p-3 rounded-[16px] text-sm flex items-center gap-2">
+          <AlertTriangle size={16} /> {error}
+        </div>
       )}
 
       {!result && (
         <button
           onClick={handleRemove}
           disabled={!!progress && progress.phase !== 'complete'}
-          className="px-6 py-2.5 bg-black text-white rounded-md text-sm font-medium hover:bg-gray-800 disabled:opacity-50"
+          className="btn-primary flex items-center gap-2"
         >
+          <Sparkles size={16} />
           {progress ? 'Traitement...' : 'Détourer l\'image'}
         </button>
       )}

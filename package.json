@@ -2,10 +2,11 @@
   "name": "qrart",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest"
@@ -13,18 +14,16 @@
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@imgly/background-removal": "^1.7.0",
-    "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.97.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.575.0",
     "nanoid": "^5.1.6",
-    "next": "16.1.6",
     "qr-code-styling": "^1.9.2",
     "qrcode": "^1.5.4",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-dropzone": "^15.0.0",
-    "sharp": "^0.34.5",
+    "react-router-dom": "^7.6.1",
     "tailwind-merge": "^3.5.0",
     "zod": "^4.3.6"
   },
@@ -38,10 +37,10 @@
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^5.1.4",
     "eslint": "^9",
-    "eslint-config-next": "16.1.6",
     "jsdom": "^28.1.0",
     "tailwindcss": "^4",
     "typescript": "^5",
+    "vite": "^6.3.5",
     "vitest": "^4.0.18"
   }
 }

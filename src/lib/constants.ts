@@ -3,8 +3,8 @@ export const APP_DESCRIPTION = 'Transformez vos silhouettes en QR Codes artistiq
 
 export const ADMIN_INVITE_CODE = 'QRART-ADMIN-2024'
 
-export const QR_BASE_URL = process.env.NEXT_PUBLIC_QR_BASE_URL || 'http://localhost:3000/api/v1/scan'
-export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+export const QR_BASE_URL = import.meta.env.VITE_QR_BASE_URL || 'http://localhost:4000/scan'
+export const APP_URL = import.meta.env.VITE_APP_URL || 'http://localhost:4000'
 
 export const STORAGE_BUCKETS = {
   originals: 'originals',

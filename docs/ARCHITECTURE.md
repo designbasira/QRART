@@ -6,15 +6,15 @@
 
 | Couche | Technologie | Version |
 |--------|-------------|---------|
-| Framework | Next.js (App Router) | 16.x |
+| Framework | Vite + React Router | 6.x |
 | Langage | TypeScript (strict) | 5.x |
 | Base de données | Supabase PostgreSQL | - |
-| Auth | Supabase Auth (email + Google OAuth) | - |
+| Auth | Supabase Auth (email + Google OAuth, PKCE) | - |
 | Storage | Supabase Storage | - |
 | Styling | Tailwind CSS | 4.x |
 | QR Generation | qr-code-styling | 1.9.x |
 | Background Removal | @imgly/background-removal | 1.7.x |
-| AI (Mockups) | Google Generative AI | 0.24.x |
+| AI (Mockups) | Google Imagen API (via whisk.ts) | - |
 | Icons | lucide-react | 0.575.x |
 | Validation | Zod | 4.x |
 | Hosting | Vercel | - |
@@ -36,32 +36,32 @@ QRART/
 │   ├── manifest.json              # PWA manifest
 │   └── sw.js                      # Service Worker
 ├── src/
-│   ├── app/
-│   │   ├── globals.css            # Design tokens CSS + glassmorphism
-│   │   ├── layout.tsx             # Root layout (fonts, PWA)
-│   │   ├── page.tsx               # Landing page
-│   │   ├── (auth)/
-│   │   │   ├── layout.tsx         # Auth layout (centered, glass)
-│   │   │   ├── login/page.tsx
-│   │   │   └── signup/page.tsx
-│   │   ├── (dashboard)/
-│   │   │   ├── layout.tsx         # Dashboard layout (auth guard)
-│   │   │   ├── admin/
-│   │   │   │   ├── page.tsx       # Admin dashboard
-│   │   │   │   ├── create/        # Pipeline création
-│   │   │   │   ├── designs/       # Liste + détail designs
-│   │   │   │   └── users/         # Gestion utilisateurs
-│   │   │   └── user/
-│   │   │       ├── page.tsx       # User dashboard (PWA home)
-│   │   │       ├── designs/       # Mes designs + éditeur
-│   │   │       └── integrations/  # Cloud integrations
-│   │   ├── scan/[id]/             # Page scan publique
-│   │   └── api/
-│   │       ├── v1/
-│   │       │   ├── scan/[id]/     # API scan (résout short_id)
-│   │       │   ├── designs/       # CRUD designs
-│   │       │   └── upload/        # Upload images
-│   │       └── generate-mockup/   # AI mockup generation
+│   ├── main.tsx                   # Entry point React
+│   ├── App.tsx                    # Routes (React Router)
+│   ├── globals.css                # Design tokens CSS + glassmorphism
+│   ├── pages/
+│   │   ├── home.tsx               # Landing page
+│   │   ├── login.tsx              # Page connexion
+│   │   ├── signup.tsx             # Page inscription
+│   │   ├── auth-callback.tsx      # OAuth callback (PKCE)
+│   │   ├── scan.tsx               # Page scan publique
+│   │   ├── not-found.tsx          # 404
+│   │   ├── admin/
+│   │   │   ├── dashboard.tsx      # Admin dashboard
+│   │   │   ├── create.tsx         # Pipeline création
+│   │   │   ├── designs.tsx        # Liste designs
+│   │   │   ├── design-detail.tsx  # Détail design
+│   │   │   └── users.tsx          # Gestion utilisateurs
+│   │   └── user/
+│   │       ├── dashboard.tsx      # User dashboard (PWA home)
+│   │       ├── designs.tsx        # Mes designs
+│   │       ├── design-detail.tsx  # Détail design user
+│   │       ├── integrations.tsx   # Cloud integrations
+│   │       ├── settings.tsx       # Paramètres
+│   │       └── subscription.tsx   # Abonnement
+│   ├── layouts/
+│   │   ├── auth-layout.tsx        # Layout auth (centered, glass)
+│   │   └── dashboard-layout.tsx   # Layout dashboard (auth guard)
 │   ├── components/
 │   │   ├── admin/
 │   │   │   ├── creation-pipeline.tsx  # 4-step stepper
@@ -70,12 +70,15 @@ QRART/
 │   │   │   ├── qr-generator.tsx
 │   │   │   └── export-panel.tsx
 │   │   ├── auth/
+│   │   │   ├── auth-provider.tsx      # AuthContext (user, profile, loading)
+│   │   │   ├── auth-guard.tsx         # Route guard (redirect /login)
+│   │   │   ├── role-guard.tsx         # Role check (admin only)
 │   │   │   ├── login-form.tsx
 │   │   │   └── signup-form.tsx
 │   │   ├── layout/
 │   │   │   ├── dashboard-shell.tsx    # Wrapper (header+sidebar+bottomnav)
 │   │   │   ├── header.tsx             # Glass header
-│   │   │   ├── sidebar.tsx            # Icon sidebar (72px) + mobile
+│   │   │   ├── sidebar.tsx            # Icon sidebar (72px)
 │   │   │   └── bottom-nav.tsx         # Mobile bottom nav (72px)
 │   │   └── user/
 │   │       └── content-editor.tsx     # Tabs Texte/Image/Lien
@@ -84,16 +87,17 @@ QRART/
 │   │   ├── utils.ts                   # cn(), formatDate()
 │   │   ├── validators.ts             # Zod schemas
 │   │   ├── supabase/
-│   │   │   ├── client.ts             # Browser client
-│   │   │   ├── server.ts             # Server client
-│   │   │   └── admin.ts              # Admin client (service role)
-│   │   └── whisk.ts                  # Google AI integration
+│   │   │   └── client.ts             # Browser client (singleton, PKCE)
+│   │   ├── qr/                        # QR generation utilities
+│   │   ├── background-removal/        # @imgly wrapper
+│   │   └── whisk.ts                   # Google Imagen API (mockups)
 │   ├── hooks/                         # Custom React hooks
 │   └── types/
 │       ├── index.ts                   # Profile, Design, etc.
 │       └── database.ts                # Supabase generated types
 ├── CLAUDE.md                          # Instructions IA
 ├── .mcp.json                          # MCP servers config
+├── vite.config.ts                     # Vite configuration
 ├── package.json
 └── tsconfig.json
 ```
@@ -106,19 +110,21 @@ QRART/
 ```
 Visitor → /login or /signup
   → Supabase Auth (email/password or Google OAuth)
-  → /auth/callback (exchange code for session)
-  → Check profiles.role
-  → Redirect: admin → /admin, user → /user
+  → Google redirects to /auth/callback?code=...
+  → Supabase client auto-exchanges code (PKCE)
+  → onAuthStateChange fires SIGNED_IN
+  → Query profiles.role
+  → window.location.href → /admin or /user
 ```
 
-### Dashboard Guard
+### Dashboard Guard (client-side)
 ```
-(dashboard)/layout.tsx (Server Component)
-  → supabase.auth.getUser()
-  → if !user → redirect('/login')
-  → fetch profile from profiles table
-  → if !profile → redirect('/login')
-  → render DashboardShell with profile prop
+App.tsx wraps all routes in <AuthProvider>
+  → Protected routes wrapped in <AuthGuard>
+  → AuthGuard checks useAuth() → user exists?
+  → if !user → <Navigate to="/login" />
+  → Admin routes also wrapped in <RoleGuard role="admin">
+  → DashboardLayout renders <DashboardShell> with profile
 ```
 
 ### QR Creation Pipeline
@@ -128,28 +134,16 @@ Admin uploads image
   → Silhouette extracted (data URL)
   → QR code generated with silhouette overlay (qr-code-styling)
   → Design saved to Supabase (designs table, nanoid short_id)
-  → Export PNG/SVG + scan link
+  → Export PNG/JPG + scan link
+  → Optional: AI mockup generation (whisk.ts → Google Imagen)
 ```
 
 ### Dynamic Scan Content
 ```
-User scans QR → GET /api/v1/scan/{short_id}
-  → Resolve short_id → design
-  → Return current_message / current_media_url
+User scans QR → /scan/{short_id}
+  → Supabase query: designs WHERE short_id = ...
+  → Display current_message / current_media_url
   → Increment scan_count
-  → Display content on /scan/{id}
-```
-
-### Client vs Server Components
-```
-Server Components (default):
-  - Pages (data fetching, auth checks)
-  - Layouts
-
-Client Components ('use client'):
-  - Interactive forms (login, signup, content editor)
-  - Stateful components (sidebar toggle, pipeline steps)
-  - Browser APIs (background removal, QR generation)
 ```
 
 ---
@@ -159,10 +153,10 @@ Client Components ('use client'):
 | Mesure | Implémentation |
 |--------|----------------|
 | RLS | Row Level Security sur toutes les tables Supabase |
-| Auth Guard | Server-side redirect dans dashboard layout |
-| Validation | Zod schemas sur tous les formulaires et APIs |
+| Auth Guard | Client-side AuthGuard + RoleGuard (React Router) |
+| Validation | Zod schemas sur tous les formulaires |
 | Admin Gate | Code d'invitation requis pour signup admin |
-| CSRF | Géré par Supabase Auth (cookies httpOnly) |
+| PKCE | Flow OAuth sécurisé (pas de token dans l'URL) |
 | XSS | React auto-escape + pas de dangerouslySetInnerHTML |
 
 ---
@@ -177,10 +171,9 @@ Client Components ('use client'):
 
 ### Variables d'environnement requises
 ```
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-NEXT_PUBLIC_APP_URL=
-NEXT_PUBLIC_QR_BASE_URL=
-GOOGLE_GENERATIVE_AI_API_KEY=
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
+VITE_APP_URL=
+VITE_QR_BASE_URL=
+VITE_GOOGLE_AI_API_KEY=
 ```
