@@ -9,20 +9,15 @@ export function AuthCallbackPage() {
   useEffect(() => {
     const supabase = createClient()
 
-    async function redirectToDashboard(userId: string) {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', userId)
-        .single()
-      window.location.href = profile?.role === 'admin' ? '/admin' : '/user'
+    function redirectToDashboard() {
+      window.location.href = '/user'
     }
 
     // Listen for auth events (SIGNED_IN or INITIAL_SESSION with PKCE)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event: AuthChangeEvent, session: Session | null) => {
         if (session?.user && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) {
-          redirectToDashboard(session.user.id)
+          redirectToDashboard()
         }
       }
     )
@@ -30,7 +25,7 @@ export function AuthCallbackPage() {
     // Also check if session already exists (in case event fired before listener)
     supabase.auth.getSession().then(({ data: { session } }: { data: { session: Session | null } }) => {
       if (session?.user) {
-        redirectToDashboard(session.user.id)
+        redirectToDashboard()
       }
     })
 

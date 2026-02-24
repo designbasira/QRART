@@ -1,7 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import { AuthProvider } from '@/components/auth/auth-provider'
 import { AuthGuard } from '@/components/auth/auth-guard'
-import { RoleGuard } from '@/components/auth/role-guard'
 import { AuthLayout } from '@/layouts/auth-layout'
 import { DashboardLayout } from '@/layouts/dashboard-layout'
 
@@ -25,13 +24,7 @@ import { UserSubscriptionPage } from '@/pages/user/subscription'
 import { DesignStudioPage } from '@/pages/user/design-studio'
 import { PodPage } from '@/pages/user/pod'
 import { EtsyPage } from '@/pages/user/etsy'
-
-// Admin pages
-import { AdminDashboardPage } from '@/pages/admin/dashboard'
-import { AdminDesignsPage } from '@/pages/admin/designs'
-import { AdminDesignDetailPage } from '@/pages/admin/design-detail'
-import { AdminUsersPage } from '@/pages/admin/users'
-import { AdminCreatePage } from '@/pages/admin/create'
+import { UserCreatePage } from '@/pages/user/create'
 
 export function App() {
   return (
@@ -60,19 +53,7 @@ export function App() {
             <Route path="/user/studio" element={<DesignStudioPage />} />
             <Route path="/user/pod" element={<PodPage />} />
             <Route path="/user/etsy" element={<EtsyPage />} />
-          </Route>
-        </Route>
-
-        {/* Admin dashboard (protected + admin role) */}
-        <Route element={<AuthGuard />}>
-          <Route element={<RoleGuard role="admin" />}>
-            <Route element={<DashboardLayout />}>
-              <Route path="/admin" element={<AdminDashboardPage />} />
-              <Route path="/admin/designs" element={<AdminDesignsPage />} />
-              <Route path="/admin/designs/:id" element={<AdminDesignDetailPage />} />
-              <Route path="/admin/users" element={<AdminUsersPage />} />
-              <Route path="/admin/create" element={<AdminCreatePage />} />
-            </Route>
+            <Route path="/user/create" element={<UserCreatePage />} />
           </Route>
         </Route>
 

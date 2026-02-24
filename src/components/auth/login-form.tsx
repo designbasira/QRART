@@ -52,15 +52,8 @@ export function LoginForm() {
         return
       }
 
-      // Use the user from the session (already authenticated, no need for getUser())
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', data.session.user.id)
-        .single()
-
       // Hard navigation to ensure cookies are sent with the request
-      window.location.href = profile?.role === 'admin' ? '/admin' : '/user'
+      window.location.href = '/user'
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur inattendue est survenue')
       setLoading(false)

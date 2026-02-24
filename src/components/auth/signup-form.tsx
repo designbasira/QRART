@@ -2,14 +2,12 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { createClient } from '@/lib/supabase/client'
 import { signupSchema, type SignupInput } from '@/lib/validators'
-import { ADMIN_INVITE_CODE } from '@/lib/constants'
 import { AlertCircle } from 'lucide-react'
 
 export function SignupForm() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
-  const [wantAdmin, setWantAdmin] = useState(false)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -22,19 +20,12 @@ export function SignupForm() {
         email: formData.get('email') as string,
         password: formData.get('password') as string,
         full_name: formData.get('full_name') as string,
-        role: wantAdmin ? 'admin' : 'user',
-        invite_code: wantAdmin ? (formData.get('invite_code') as string) : undefined,
+        role: 'user',
       }
 
       const result = signupSchema.safeParse(input)
       if (!result.success) {
         setError(result.error.issues[0].message)
-        setLoading(false)
-        return
-      }
-
-      if (input.role === 'admin' && input.invite_code !== ADMIN_INVITE_CODE) {
-        setError("Code d'invitation admin invalide")
         setLoading(false)
         return
       }
@@ -47,7 +38,7 @@ export function SignupForm() {
         options: {
           data: {
             full_name: input.full_name,
-            role: input.role,
+            role: 'user',
           },
         },
       })
@@ -57,16 +48,8 @@ export function SignupForm() {
         return
       }
 
-      // 2. Update profile role if admin
-      if (input.role === 'admin' && signUpData.user) {
-        await supabase
-          .from('profiles')
-          .update({ role: 'admin', full_name: input.full_name })
-          .eq('id', signUpData.user.id)
-      }
-
-      // 3. Redirect to dashboard
-      window.location.href = input.role === 'admin' ? '/admin' : '/user'
+      // 2. Redirect to dashboard
+      window.location.href = '/user'
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur inattendue est survenue')
       setLoading(false)
@@ -173,35 +156,6 @@ export function SignupForm() {
             placeholder="Minimum 6 caractères"
           />
         </div>
-
-        <div className="flex items-center gap-2">
-          <input
-            id="want_admin"
-            type="checkbox"
-            checked={wantAdmin}
-            onChange={(e) => setWantAdmin(e.target.checked)}
-            className="h-5 w-5 rounded-[6px] border-border accent-primary"
-          />
-          <label htmlFor="want_admin" className="text-sm text-text-secondary">
-            Compte administrateur
-          </label>
-        </div>
-
-        {wantAdmin && (
-          <div className="animate-scale-in">
-            <label htmlFor="invite_code" className="block text-sm font-medium text-text-primary mb-2">
-              Code d&apos;invitation admin
-            </label>
-            <input
-              id="invite_code"
-              name="invite_code"
-              type="text"
-              required
-              className="input"
-              placeholder="XXXX-XXXX-XXXX"
-            />
-          </div>
-        )}
 
         <button
           type="submit"

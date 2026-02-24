@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { createClient } from '@/lib/supabase/client'
 import { APP_NAME } from '@/lib/constants'
-import { LogOut, Shield, User, Menu, Bell } from 'lucide-react'
+import { LogOut, Menu, Bell } from 'lucide-react'
 import { ThemeToggle } from '@/components/layout/theme-toggle'
 import { LocaleToggle } from '@/components/layout/locale-toggle'
 import type { Profile } from '@/types'
@@ -42,16 +42,6 @@ export function Header({ profile, onMenuToggle }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-3">
-        {/* Role badge */}
-        <span className={`inline-flex items-center gap-1 rounded-[999px] px-3 py-1 text-xs font-semibold ${
-          profile.role === 'admin'
-            ? 'bg-primary text-white'
-            : 'bg-primary-soft text-primary'
-        }`}>
-          {profile.role === 'admin' ? <Shield className="w-3 h-3" /> : <User className="w-3 h-3" />}
-          {profile.role}
-        </span>
-
         {/* Locale toggle */}
         <div className="hidden sm:block">
           <LocaleToggle />

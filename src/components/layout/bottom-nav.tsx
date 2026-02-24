@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
-import { Home, Grid3X3, Palette, Plus, Crown, Settings } from 'lucide-react'
+import { Home, Grid3X3, Palette, Plus, Settings } from 'lucide-react'
 import type { Profile } from '@/types'
 
 interface BottomNavProps {
@@ -11,21 +11,13 @@ const userTabs = [
   { label: 'Home', href: '/user', icon: Home },
   { label: 'Designs', href: '/user/designs', icon: Grid3X3 },
   { label: 'Studio', href: '/user/studio', icon: Palette, isCenter: true },
-  { label: 'Abo', href: '/user/subscription', icon: Crown },
+  { label: 'Créer', href: '/user/create', icon: Plus },
   { label: 'Réglages', href: '/user/settings', icon: Settings },
-]
-
-const adminTabs = [
-  { label: 'Home', href: '/admin', icon: Home },
-  { label: 'Designs', href: '/admin/designs', icon: Grid3X3 },
-  { label: 'Créer', href: '/admin/create', icon: Plus, isCenter: true },
-  { label: 'Users', href: '/admin/users', icon: Crown },
-  { label: 'Réglages', href: '/admin/settings', icon: Settings },
 ]
 
 export function BottomNav({ profile }: BottomNavProps) {
   const { pathname } = useLocation()
-  const tabs = profile.role === 'admin' ? adminTabs : userTabs
+  const tabs = userTabs
 
   return (
     <nav className="fixed bottom-0 inset-x-0 z-50 md:hidden glass border-t border-border"
@@ -34,7 +26,7 @@ export function BottomNav({ profile }: BottomNavProps) {
         {tabs.map((tab) => {
           const Icon = tab.icon
           const isActive = pathname === tab.href ||
-            (tab.href !== '/user' && tab.href !== '/admin' && pathname.startsWith(tab.href))
+            (tab.href !== '/user' && pathname.startsWith(tab.href))
 
           if (tab.isCenter) {
             return (

@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
-import { LayoutDashboard, Plus, Image, Users, FolderOpen, Link2, Settings, X, Palette, ShoppingBag, Store } from 'lucide-react'
+import { LayoutDashboard, Plus, Settings, X, Palette, ShoppingBag, Store, Crown, ChevronsRight, ChevronsLeft } from 'lucide-react'
 import type { Profile } from '@/types'
 import type { LucideIcon } from 'lucide-react'
 
@@ -10,40 +10,48 @@ interface NavItem {
   icon: LucideIcon
 }
 
-const adminNav: NavItem[] = [
-  { label: 'Vue d\'ensemble', href: '/admin', icon: LayoutDashboard },
-  { label: 'Nouveau design', href: '/admin/create', icon: Plus },
-  { label: 'Designs', href: '/admin/designs', icon: Image },
-  { label: 'Utilisateurs', href: '/admin/users', icon: Users },
-]
-
-const userNav: NavItem[] = [
-  { label: 'Vue d\'ensemble', href: '/user', icon: LayoutDashboard },
+const navItems: NavItem[] = [
+  { label: 'QRART', href: '/user', icon: LayoutDashboard },
+  { label: 'Créer un QR', href: '/user/create', icon: Plus },
   { label: 'Studio', href: '/user/studio', icon: Palette },
-  { label: 'Mes designs', href: '/user/designs', icon: FolderOpen },
   { label: 'Commander', href: '/user/pod', icon: ShoppingBag },
   { label: 'Etsy', href: '/user/etsy', icon: Store },
-  { label: 'Intégrations', href: '/user/integrations', icon: Link2 },
+  { label: 'Abonnement', href: '/user/subscription', icon: Crown },
 ]
 
-/* ============ ICON SIDEBAR (Desktop) — Image 3/4 style ============ */
-export function Sidebar({ profile }: { profile: Profile }) {
+interface SidebarProps {
+  profile: Profile
+  expanded: boolean
+  onToggle: () => void
+}
+
+/* ============ ICON SIDEBAR (Desktop) — Expandable ============ */
+export function Sidebar({ profile, expanded, onToggle }: SidebarProps) {
   const { pathname } = useLocation()
-  const navItems = profile.role === 'admin' ? adminNav : userNav
 
   const initials = profile.full_name
     ? profile.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
     : (profile.email?.[0] ?? 'U').toUpperCase()
 
   return (
-    <aside className="hidden md:flex flex-col items-center w-[72px] min-h-[calc(100vh-53px)] glass-panel !rounded-none !rounded-r-[28px] py-6 gap-2">
-      {/* Logo icon */}
-      <div className="w-10 h-10 rounded-[18px] bg-primary flex items-center justify-center text-white font-bold text-sm mb-6">
-        Q
+    <aside
+      className={cn(
+        'hidden md:flex flex-col min-h-[calc(100vh-53px)] glass-panel !rounded-none !rounded-r-[28px] py-6 gap-2 transition-all duration-300',
+        expanded ? 'w-[220px] px-4' : 'w-[72px] items-center'
+      )}
+    >
+      {/* Logo */}
+      <div className={cn('flex items-center mb-6', expanded ? 'gap-3 px-1' : 'justify-center')}>
+        <div className="w-10 h-10 rounded-[18px] bg-primary flex items-center justify-center text-white font-bold text-sm shrink-0">
+          Q
+        </div>
+        {expanded && (
+          <span className="font-serif font-bold text-base text-text-primary truncate">QRART</span>
+        )}
       </div>
 
-      {/* Nav icons */}
-      <nav className="flex flex-col items-center gap-2 flex-1">
+      {/* Nav items */}
+      <nav className={cn('flex flex-col gap-1.5 flex-1', !expanded && 'items-center')}>
         {navItems.map((item) => {
           const Icon = item.icon
           const isActive = pathname === item.href
@@ -52,18 +60,24 @@ export function Sidebar({ profile }: { profile: Profile }) {
               key={item.href}
               to={item.href}
               className={cn(
-                'relative w-10 h-10 rounded-[18px] flex items-center justify-center transition-all duration-200 group',
+                'relative flex items-center rounded-[18px] transition-all duration-200 group',
+                expanded ? 'gap-3 px-3 py-2.5' : 'w-10 h-10 justify-center',
                 isActive
                   ? 'bg-primary-soft text-primary shadow-sm shadow-primary/10'
-                  : 'text-text-secondary hover:bg-surface-alt hover:text-text-primary'
+                  : 'text-text-primary hover:bg-surface-alt'
               )}
-              title={item.label}
+              title={!expanded ? item.label : undefined}
             >
-              <Icon className="w-5 h-5" />
-              {/* Tooltip */}
-              <span className="absolute left-14 px-3 py-1.5 rounded-[12px] bg-text-primary text-white text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-lg z-50">
-                {item.label}
-              </span>
+              <Icon className="w-5 h-5 shrink-0" />
+              {expanded && (
+                <span className="text-sm font-medium truncate">{item.label}</span>
+              )}
+              {/* Tooltip (collapsed only) */}
+              {!expanded && (
+                <span className="absolute left-14 px-3 py-1.5 rounded-[12px] bg-text-primary text-white text-xs font-medium whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity shadow-lg z-50">
+                  {item.label}
+                </span>
+              )}
             </Link>
           )
         })}
@@ -71,17 +85,41 @@ export function Sidebar({ profile }: { profile: Profile }) {
 
       {/* Settings */}
       <Link
-        to={profile.role === 'admin' ? '/admin/settings' : '/user/settings'}
-        className="w-10 h-10 rounded-[18px] flex items-center justify-center text-text-secondary hover:bg-surface-alt hover:text-text-primary transition-all mb-2"
-        title="Paramètres"
+        to="/user/settings"
+        className={cn(
+          'flex items-center rounded-[18px] text-text-primary hover:bg-surface-alt transition-all mb-2',
+          expanded ? 'gap-3 px-3 py-2.5' : 'w-10 h-10 justify-center'
+        )}
+        title={!expanded ? 'Paramètres' : undefined}
       >
-        <Settings className="w-5 h-5" />
+        <Settings className="w-5 h-5 shrink-0" />
+        {expanded && <span className="text-sm font-medium">Paramètres</span>}
       </Link>
 
       {/* Avatar */}
-      <div className="w-10 h-10 rounded-[999px] bg-primary-soft flex items-center justify-center text-xs font-semibold text-primary">
-        {initials}
+      <div className={cn('flex items-center', expanded ? 'gap-3 px-1' : 'justify-center')}>
+        <div className="w-10 h-10 rounded-[999px] bg-primary-soft flex items-center justify-center text-xs font-semibold text-primary shrink-0">
+          {initials}
+        </div>
+        {expanded && (
+          <span className="text-sm font-medium text-text-primary truncate">
+            {profile.full_name || profile.email}
+          </span>
+        )}
       </div>
+
+      {/* Toggle expand/collapse */}
+      <button
+        onClick={onToggle}
+        className={cn(
+          'flex items-center rounded-[18px] text-text-primary hover:bg-surface-alt transition-all mt-2',
+          expanded ? 'gap-3 px-3 py-2.5' : 'w-10 h-10 justify-center'
+        )}
+        title={expanded ? 'Réduire' : 'Agrandir'}
+      >
+        {expanded ? <ChevronsLeft className="w-5 h-5 shrink-0" /> : <ChevronsRight className="w-5 h-5" />}
+        {expanded && <span className="text-sm font-medium">Réduire</span>}
+      </button>
     </aside>
   )
 }
@@ -89,7 +127,6 @@ export function Sidebar({ profile }: { profile: Profile }) {
 /* ============ MOBILE SIDEBAR (Overlay) ============ */
 export function MobileSidebar({ profile, open, onClose }: { profile: Profile; open: boolean; onClose: () => void }) {
   const { pathname } = useLocation()
-  const navItems = profile.role === 'admin' ? adminNav : userNav
 
   if (!open) return null
 
@@ -122,7 +159,7 @@ export function MobileSidebar({ profile, open, onClose }: { profile: Profile; op
                   'flex items-center gap-3 px-4 py-3 rounded-[18px] text-sm font-semibold transition-all',
                   isActive
                     ? 'bg-primary-soft text-primary'
-                    : 'text-text-secondary hover:text-text-primary hover:bg-surface-alt'
+                    : 'text-text-primary hover:bg-surface-alt'
                 )}
               >
                 <Icon className="w-5 h-5 shrink-0" />
