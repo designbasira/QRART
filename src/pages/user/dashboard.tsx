@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/components/auth/auth-provider'
 import { createClient } from '@/lib/supabase/client'
-import { QrCode, Eye, Zap, Plus, Edit, Grid3X3, Crown, TrendingUp, ArrowRight, Sparkles } from 'lucide-react'
+import { QrCode, Eye, Zap, Link2, Plus, Edit, Grid3X3, Crown, TrendingUp, ArrowRight, Sparkles } from 'lucide-react'
 
 export function UserDashboardPage() {
   const { user, profile } = useAuth()
@@ -67,7 +67,7 @@ export function UserDashboardPage() {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 stagger">
         {[
-          { icon: Plus, label: 'Nouveau design', href: '/user/designs', accent: true },
+          { icon: Link2, label: 'Lier un QR', href: '/user/designs', accent: true },
           { icon: Edit, label: 'Modifier message', href: '/user/designs', accent: false },
           { icon: Grid3X3, label: 'Mes QR codes', href: '/user/designs', accent: false },
           { icon: Crown, label: 'Abonnement', href: '/user/subscription', accent: false },
