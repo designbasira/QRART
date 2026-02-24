@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
-import { Home, Grid3X3, Plus, Crown, Settings } from 'lucide-react'
+import { Home, Grid3X3, Palette, Plus, Crown, Settings } from 'lucide-react'
 import type { Profile } from '@/types'
 
 interface BottomNavProps {
@@ -10,7 +10,7 @@ interface BottomNavProps {
 const userTabs = [
   { label: 'Home', href: '/user', icon: Home },
   { label: 'Designs', href: '/user/designs', icon: Grid3X3 },
-  { label: 'Créer', href: '/user/designs', icon: Plus, isCenter: true },
+  { label: 'Studio', href: '/user/studio', icon: Palette, isCenter: true },
   { label: 'Abo', href: '/user/subscription', icon: Crown },
   { label: 'Réglages', href: '/user/settings', icon: Settings },
 ]

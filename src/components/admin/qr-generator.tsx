@@ -22,6 +22,7 @@ export function QRGenerator({ silhouetteImage, onQRGenerated }: QRGeneratorProps
     width: 512,
     height: 512,
   })
+  const [transparentBg, setTransparentBg] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -77,7 +78,7 @@ export function QRGenerator({ silhouetteImage, onQRGenerated }: QRGeneratorProps
         {/* Preview */}
         <div>
           <p className="text-sm text-text-secondary mb-2">Aperçu</p>
-          <div ref={qrRef} className="border border-border rounded-[18px] p-4 flex items-center justify-center bg-surface" />
+          <div ref={qrRef} className={`border border-border rounded-[18px] p-4 flex items-center justify-center ${transparentBg ? 'bg-[length:20px_20px] bg-[position:0_0,10px_10px]' : 'bg-surface'}`} style={transparentBg ? { backgroundImage: 'linear-gradient(45deg, #e0e0e0 25%, transparent 25%), linear-gradient(-45deg, #e0e0e0 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e0e0e0 75%), linear-gradient(-45deg, transparent 75%, #e0e0e0 75%)' } : undefined} />
         </div>
 
         {/* Options */}
@@ -109,12 +110,29 @@ export function QRGenerator({ silhouetteImage, onQRGenerated }: QRGeneratorProps
 
           <div>
             <label className="block text-sm font-medium text-text-primary mb-1">Couleur de fond</label>
-            <input
-              type="color"
-              value={config.backgroundColor}
-              onChange={(e) => setConfig({ ...config, backgroundColor: e.target.value })}
-              className="h-[48px] w-full rounded-[16px] border border-border cursor-pointer"
-            />
+            <div className="flex items-center gap-3 mb-2">
+              <input
+                type="checkbox"
+                id="transparentBg"
+                checked={transparentBg}
+                onChange={(e) => {
+                  setTransparentBg(e.target.checked)
+                  setConfig({ ...config, backgroundColor: e.target.checked ? 'transparent' : '#ffffff' })
+                }}
+                className="h-4 w-4 rounded border-border accent-primary"
+              />
+              <label htmlFor="transparentBg" className="text-sm text-text-primary">
+                Fond transparent
+              </label>
+            </div>
+            {!transparentBg && (
+              <input
+                type="color"
+                value={config.backgroundColor}
+                onChange={(e) => setConfig({ ...config, backgroundColor: e.target.value })}
+                className="h-[48px] w-full rounded-[16px] border border-border cursor-pointer"
+              />
+            )}
           </div>
 
           <div className="flex items-center gap-2">

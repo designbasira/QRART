@@ -20,7 +20,7 @@ export function createStyledQR(config: QRConfig): QRCodeStyling {
       type: 'extra-rounded',
     },
     backgroundOptions: {
-      color: config.backgroundColor ?? '#ffffff',
+      color: config.backgroundColor === 'transparent' ? '#00000000' : (config.backgroundColor ?? '#ffffff'),
     },
     imageOptions: {
       crossOrigin: 'anonymous',

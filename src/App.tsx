@@ -22,6 +22,9 @@ import { UserDesignDetailPage } from '@/pages/user/design-detail'
 import { UserIntegrationsPage } from '@/pages/user/integrations'
 import { UserSettingsPage } from '@/pages/user/settings'
 import { UserSubscriptionPage } from '@/pages/user/subscription'
+import { DesignStudioPage } from '@/pages/user/design-studio'
+import { PodPage } from '@/pages/user/pod'
+import { EtsyPage } from '@/pages/user/etsy'
 
 // Admin pages
 import { AdminDashboardPage } from '@/pages/admin/dashboard'
@@ -54,6 +57,9 @@ export function App() {
             <Route path="/user/integrations" element={<UserIntegrationsPage />} />
             <Route path="/user/settings" element={<UserSettingsPage />} />
             <Route path="/user/subscription" element={<UserSubscriptionPage />} />
+            <Route path="/user/studio" element={<DesignStudioPage />} />
+            <Route path="/user/pod" element={<PodPage />} />
+            <Route path="/user/etsy" element={<EtsyPage />} />
           </Route>
         </Route>
 

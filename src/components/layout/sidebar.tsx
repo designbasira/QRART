@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
-import { LayoutDashboard, Plus, Image, Users, FolderOpen, Link2, Settings, X } from 'lucide-react'
+import { LayoutDashboard, Plus, Image, Users, FolderOpen, Link2, Settings, X, Palette, ShoppingBag, Store } from 'lucide-react'
 import type { Profile } from '@/types'
 import type { LucideIcon } from 'lucide-react'
 
@@ -19,7 +19,10 @@ const adminNav: NavItem[] = [
 
 const userNav: NavItem[] = [
   { label: 'Vue d\'ensemble', href: '/user', icon: LayoutDashboard },
+  { label: 'Studio', href: '/user/studio', icon: Palette },
   { label: 'Mes designs', href: '/user/designs', icon: FolderOpen },
+  { label: 'Commander', href: '/user/pod', icon: ShoppingBag },
+  { label: 'Etsy', href: '/user/etsy', icon: Store },
   { label: 'Intégrations', href: '/user/integrations', icon: Link2 },
 ]
 
