@@ -22,6 +22,7 @@ export const AI_PROVIDERS: AIProvider[] = [
     description: 'Stable Diffusion XL — free tier limité',
     keyPlaceholder: 'hf_...',
     docsUrl: 'https://huggingface.co/settings/tokens',
+    envKey: 'VITE_HUGGINGFACE_API_KEY',
   },
   {
     id: 'openai',
