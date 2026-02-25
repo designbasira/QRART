@@ -1,25 +1,20 @@
 import { getApiKey } from './keys'
-import { generateGoogleImagen } from './adapters/google-imagen'
-import { generateHuggingFace } from './adapters/huggingface'
-import { generateOpenAI } from './adapters/openai'
-import { generateReplicate } from './adapters/replicate'
 
 export async function generateImage(prompt: string, providerId: string): Promise<string> {
+  // User key from localStorage (optional — server has its own fallback)
   const apiKey = getApiKey(providerId)
-  if (!apiKey) {
-    throw new Error('Aucune clé API configurée pour ce modèle. Cliquez sur l\'icône 🔑 pour en ajouter une.')
+
+  const res = await fetch('/api/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt, providerId, apiKey }),
+  })
+
+  const data = await res.json()
+
+  if (!res.ok) {
+    throw new Error(data.error || `Erreur serveur : ${res.status}`)
   }
 
-  switch (providerId) {
-    case 'google-imagen':
-      return generateGoogleImagen(prompt, apiKey)
-    case 'huggingface':
-      return generateHuggingFace(prompt, apiKey)
-    case 'openai':
-      return generateOpenAI(prompt, apiKey)
-    case 'replicate':
-      return generateReplicate(prompt, apiKey)
-    default:
-      throw new Error(`Provider inconnu : ${providerId}`)
-  }
+  return data.dataUrl
 }
